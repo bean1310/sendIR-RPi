@@ -7,4 +7,5 @@ set(CMAKE_C_FLAGS "-Wall")
 add_executable(sendIR
         sendIR.c)
 
-target_link_libraries(wiringPi)
+find_library(wiringPi_LIB wiringPi)
+target_link_libraries(Object ${wiringPi_LIB})
