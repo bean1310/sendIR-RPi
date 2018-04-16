@@ -8,4 +8,4 @@ add_executable(sendIR
         sendIR.c)
 
 find_library(wiringPi_LIB wiringPi)
-target_link_libraries(Object ${wiringPi_LIB})
+target_link_libraries(sendIR ${wiringPi_LIB})
