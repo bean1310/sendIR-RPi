@@ -51,7 +51,7 @@ int main(int argc, char *argv[]){
     if(wiringPiSetup() == -1) return 1;
 
     pinMode(SEND_PIN, PWM_OUTPUT);
-    pwmSetMode(PWM_MDO_MS);
+    pwmSetMode(PWM_MODE_MS);
     pwmSetRange(DUTY);
     pwmSetClock((int)(19200 / 38 / DUTY));
 
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]){
 
             // データの送信
             pwmWrite(SEND_PIN, 1);
-            delayMicrosecond(MODULATION_TIME);
+            delayMicroseconds(MODULATION_TIME);
             pwmWrite(SEND_PIN, 0);
             delayMicroseconds(MODULATION_TIME * ( 1 + signalBit * 2 ) );
 
