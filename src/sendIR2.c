@@ -28,6 +28,8 @@ const unsigned int REPEAT_SEND_CODE = 3;
 // 変調単位の設定(マイクロ秒)
 const unsigned int MODULATION_TIME = 560;
 
+const unsigned int DUTY = 3;
+
 int main(int argc, char *argv[]){
 
     FILE *fp;
@@ -48,21 +50,17 @@ int main(int argc, char *argv[]){
 
     if(wiringPiSetup() == -1) return 1;
 
-    pinMode(SEND_PIN, OUTPUT);
+    pinMode(SEND_PIN, PWM_OUTPUT);
+    pwmSetMode(PWM_MDO_MS);
+    pwmSetRange(DUTY);
+    pwmSetClock((int)(19200 / 38 / DUTY));
 
     for(n = 0; n < REPEAT_SEND_CODE; n++) {
 
         /* Send Leader Code*/
-        for(i = 0; i < MODULATION_TIME * 16 / 26; i++) {
-
-            digitalWrite(SEND_PIN, 1);
-            delayMicroseconds(9);
-            digitalWrite(SEND_PIN, 0);
-            delayMicroseconds(17);
-
-        }
-
-        digitalWrite(SEND_PIN, 0);
+        pwmWrite(SEND_PIN, 1);
+        delayMicroseconds(MODULATION_TIME * 16);
+        pwmWrite(SEND_PIN, 0);
         delayMicroseconds(MODULATION_TIME * 8);
 
         // Send customer and data code.
@@ -77,17 +75,11 @@ int main(int argc, char *argv[]){
             // データの整形
             signalBit = offTime / onTime >= 3 ? 1 : 0;
 
-            for(i = 0; i < MODULATION_TIME / 26; i++) {
-
-                digitalWrite(SEND_PIN, 1);
-                delayMicroseconds(9);
-                digitalWrite(SEND_PIN, 0);
-                delayMicroseconds(17);
-
-            }
-                
-        digitalWrite(SEND_PIN, 0);
-        delayMicroseconds(MODULATION_TIME * ( 1 + signalBit * 2 ) );
+            // データの送信
+            pwmWrite(SEND_PIN, 1);
+            delayMicrosecond(MODULATION_TIME);
+            pwmWrite(SEND_PIN, 0);
+            delayMicroseconds(MODULATION_TIME * ( 1 + signalBit * 2 ) );
 
         }
 
