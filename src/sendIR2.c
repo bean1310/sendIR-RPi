@@ -2,7 +2,7 @@
  * File:   main.c
  * Author: BEAN
  *
- * Created on August 2, 2017, 3:57 AM
+ * Created on April 16, 2018, 21:00
  */
 
  /*
@@ -20,14 +20,18 @@
 #include "rpi-pin.h"
 
 // 赤外線センサのOutputピンに接続するGPIOピンの指定
-#define SENDPIN GPIO_18
+const unsigned int SEND_PIN = GPIO_18;
 
-#define MODULATION_TIME 560
+// 赤外線信号を繰り返し送信する回数.
+const unsigned int REPEAT_SEND_CODE = 3;
+
+// 変調単位の設定(マイクロ秒)
+const unsigned int MODULATION_TIME = 560;
 
 int main(int argc, char *argv[]){
 
     FILE *fp;
-    char fileName[32];
+    char fileName[128];
     int onTime, offTime, signalBit;
     int i, n;
 
@@ -44,23 +48,24 @@ int main(int argc, char *argv[]){
 
     if(wiringPiSetup() == -1) return 1;
 
-    pinMode(SENDPIN, OUTPUT);
+    pinMode(SEND_PIN, OUTPUT);
 
-    /* Send Leader */
-    for(i = 0; i < MODULATION_TIME * 16 / 26; i++) {
+    for(n = 0; n < REPEAT_SEND_CODE; n++) {
 
-            digitalWrite(SENDPIN, 1);
+        /* Send Leader Code*/
+        for(i = 0; i < MODULATION_TIME * 16 / 26; i++) {
+
+            digitalWrite(SEND_PIN, 1);
             delayMicroseconds(9);
-            digitalWrite(SENDPIN, 0);
+            digitalWrite(SEND_PIN, 0);
             delayMicroseconds(17);
 
-    }
+        }
 
-    digitalWrite(SENDPIN, 0);
-    delayMicroseconds(MODULATION_TIME * 8);    
+        digitalWrite(SEND_PIN, 0);
+        delayMicroseconds(MODULATION_TIME * 8);
 
-    for(n = 0; n < 3; n++) {
-
+        // Send customer and data code.
         rewind(fp);
 
         fseek(fp, (int)sizeof(int) * 7, SEEK_SET);
@@ -69,18 +74,19 @@ int main(int argc, char *argv[]){
 
             printf("%d %d\n", onTime, offTime);
 
+            // データの整形
             signalBit = offTime / onTime >= 3 ? 1 : 0;
 
             for(i = 0; i < MODULATION_TIME / 26; i++) {
 
-                digitalWrite(SENDPIN, 1);
+                digitalWrite(SEND_PIN, 1);
                 delayMicroseconds(9);
-                digitalWrite(SENDPIN, 0);
+                digitalWrite(SEND_PIN, 0);
                 delayMicroseconds(17);
 
             }
                 
-        digitalWrite(SENDPIN, 0);
+        digitalWrite(SEND_PIN, 0);
         delayMicroseconds(MODULATION_TIME * ( 1 + signalBit * 2 ) );
 
         }

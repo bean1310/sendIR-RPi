@@ -2,7 +2,7 @@
  * File:   main.c
  * Author: BEAN
  *
- * Created on August 2, 2017, 3:57 AM
+ * Created on April 16, 2018, 21:00
  */
 
  /*
@@ -20,7 +20,13 @@
 #include "rpi-pin.h"
 
 // 赤外線センサのOutputピンに接続するGPIOピンの指定
-#define SENDPIN GPIO_18
+const unsigned int SEND_PIN = GPIO_18;
+
+// 赤外線信号を繰り返し送信する回数.
+const unsigned int REPEAT_SEND_CODE = 3;
+
+// 変調単位の設定(マイクロ秒)
+const unsigned int MODULATION_TIME = 560;
 
 int main(int argc, char *argv[]){
 
@@ -42,29 +48,32 @@ int main(int argc, char *argv[]){
 
     if(wiringPiSetup() == -1) return 1;
 
-    pinMode(SENDPIN, OUTPUT);
+    pinMode(SEND_PIN, OUTPUT);
 
-    for(n = 0; n < 1; n++) {
+    for(n = 0; n < REPEAT_SEND_CODE; n++) {
 
         rewind(fp);
 
-    while(fscanf(fp, "%d %d", &onTime, &offTime) != EOF) {
+        while(fscanf(fp, "%d %d", &onTime, &offTime) != EOF) {
 
         for(i = 0; i < onTime / 26; i++) {
 
-            digitalWrite(SENDPIN, 1);
+            digitalWrite(SEND_PIN, 1);
             delayMicroseconds(9);
-            digitalWrite(SENDPIN, 0);
+            digitalWrite(SEND_PIN, 0);
             delayMicroseconds(17);
 
         }
 
-            digitalWrite(SENDPIN, 0);
-            delayMicroseconds(offTime);
+        digitalWrite(SEND_PIN, 0);
+        delayMicroseconds(offTime);
 
+#ifdef DEBUG
         printf("%d %d\n", onTime, offTime);
+#endif
 
-    }
+
+        }
 
     }
 

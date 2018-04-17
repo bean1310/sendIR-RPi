@@ -11,11 +11,11 @@ GPIOピン配置はRaspberry Pi 3 Model Bと同様のもの(以降これらをRP
 赤外線LEDをRPiに繋ぐ.(赤外線LED: OSI5FU5111C-40で動作確認)
 赤外線LEDのアノードを
 ```objectivec
-#define SENDPIN
+#define SEND_PIN
 ```
 で定義されたGPIOピンに接続する(デフォルトはGPIOの18番ピン).  
 ...のでもいいけれど電流が足りないので, LEDはRPiの5vピンから電源を取り,  
-SENDPINに指定されたGPIOピンにトランジスタのベースを接続して使いほうが良い.
+SEND_PINに指定されたGPIOピンにトランジスタのベースを接続して使いほうが良い.
 
 これで `./sendIR <readIRにより出力されたファイル名>`を実行すると, 接続された赤外線LEDからしたいされたファイルの赤外線信号が送信される.
 

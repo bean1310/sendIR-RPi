@@ -3,6 +3,7 @@ cmake_minimum_required( VERSION 3.0)
 project(sendIR-RPi C)
 
 set(CMAKE_C_FLAGS "-Wall")
+set(CMAKE_C_FLAGS_DEBUG "-DDEBUG")
 
 add_executable(sendIR-RPi
         src/sendIR.c)
