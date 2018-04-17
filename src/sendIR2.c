@@ -26,7 +26,7 @@ const unsigned int SEND_PIN = GPIO_18;
 const unsigned int REPEAT_SEND_CODE = 3;
 
 // 変調単位の設定(マイクロ秒)
-const unsigned int MODULATION_TIME = 560;
+const unsigned int MODULATION_TIME = 562;
 
 const unsigned int DUTY = 3;
 
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]){
             printf("%d %d\n", onTime, offTime);
 
             // データの整形
-            signalBit = offTime / onTime >= 3 ? 1 : 0;
+            signalBit = offTime / onTime >= 2 ? 1 : 0;
 
             // データの送信
             pwmWrite(SEND_PIN, 1);
